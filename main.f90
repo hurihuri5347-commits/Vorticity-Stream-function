@@ -3,17 +3,23 @@ program main
     use solver
     use postprocess
     use grid
+    use init
     implicit none
 
     integer :: NM, JM
-    real :: L, H, dx, dy
-    real, allocatable :: x(:), y(:)
+    real, allocatable :: x(:), y(:), Om(:,:), phi(:,:)
+    real, allocatable :: cx(:,:), cy(:,:), diffx, diffy
+    integer, allocatable :: bc_type(:,:)
 
-    allocate(x(0:NM+1), y(0:JM+1))
-
-    ! Set grid parameters
-    L = 1.0; H = 1.0; dx = 0.1; dy = 0.1
     NM = int(L/dx)+1; JM = int(H/dy)+1
+    allocate(x(NM), y(JM))
+    allocate(Om(NM, JM), phi(NM, JM))
+    allocate(cx(NM, JM), cy(NM, JM))
+    allocate(bc_type(NM, JM))
+    
+    call make_grid(NM, JM, dx, dy, x, y)
+
+    
 
     
 
