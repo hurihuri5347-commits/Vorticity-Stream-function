@@ -132,4 +132,47 @@ module postprocess
  
     end subroutine save_tecplot
 
+
+    subroutine save_tec(filename, NM, JM, dx, dy, u, v, Om, psi, sol_time)
+        implicit none
+
+        character(len=*), intent(in) :: filename
+        integer, intent(in)          :: NM, JM
+        real, intent(in)             :: dx, dy
+        real, intent(in)             :: u(NM,JM), v(NM,JM)
+        real, intent(in)             :: Om(NM,JM), psi(NM,JM)
+        real, intent(in)             :: sol_time   ! 추가: 현재 물리 시간
+
+        integer :: i, j, unit_num
+        real    :: x_coord, y_coord, umag
+
+        unit_num = 21
+        ! 수정
+        open(unit=unit_num, file=filename, status='replace', action='write')
+
+        write(unit_num, '(A)') 'TITLE = "Cavity Flow CFD Results"'
+        write(unit_num, '(A)') 'VARIABLES = "X" "Y" "U" "V" "Umag" "Omega" "Psi"'
+
+        ! STRANDID=1 고정 (같은 zone을 시간축으로 묶음)
+        ! SOLUTIONTIME 으로 각 스텝의 물리 시간 기록
+        write(unit_num, '(A, I6, A, I6, A, E18.9)') &
+            'ZONE T="Flow Field", I=', NM, ', J=', JM, &
+            ', F=POINT, STRANDID=1, SOLUTIONTIME=', sol_time
+
+        do j = 1, JM
+            do i = 1, NM
+                x_coord = real(i-1) * dx
+                y_coord = real(j-1) * dy
+                umag = sqrt(u(i,j)**2 + v(i,j)**2)
+                write(unit_num, '(7E18.9)') &
+                    x_coord, y_coord, u(i,j), v(i,j), umag, Om(i,j), psi(i,j)
+            end do
+        end do
+
+        close(unit_num)
+        print *, "Successfully saved Tecplot file: ", filename
+
+    end subroutine save_tec
+
+
 end module postprocess

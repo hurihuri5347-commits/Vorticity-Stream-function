@@ -4,7 +4,7 @@ module grid
 
     subroutine gen_grid(dx,dy,x,y,L,H,NM,JM)
         integer, intent(in) :: NM,JM
-        real, intent(inout) :: x(0:NM+1), y(0:JM+1)
+        real, intent(inout) :: x(NM), y(JM)
         real, intent(in) :: L, H, dx, dy
         integer :: i
 

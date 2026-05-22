@@ -1,21 +1,29 @@
 #!/bin/bash
 
 # 컴파일할 소스 파일명
-SOURCE_FILE="grid.f90 init.f90 param.f90 postprocess.f90 solver.f90 main.f90 "
+SOURCE_FILE="grid.f90 init.f90 param.f90 postprocess.f90 solver.f90 main.f90"
 # 생성할 실행 파일명
 OUTPUT_FILE="main.exe"
 
+# 빌드 모드 선택 (debug / release)
+MODE=${1:-release}
+
+if [ "$MODE" = "release" ]; then
+    FLAGS="-O3 -ffree-line-length-none"
+    echo "Mode: RELEASE"
+else
+    FLAGS="-O0 -g -fcheck=all -fbacktrace -Wall -Wextra -ffree-line-length-none"
+    echo "Mode: DEBUG"
+fi
+
 echo "Compiling $SOURCE_FILE into $OUTPUT_FILE..."
 
-# nvfortran 컴파일 명령어
-gfortran -O3 $SOURCE_FILE -o $OUTPUT_FILE
+gfortran $FLAGS $SOURCE_FILE -o $OUTPUT_FILE
 
-# 컴파일 성공 여부 확인
 if [ $? -eq 0 ]; then
     echo "------------------------------------------"
     echo "Compilation Successful! Running the program..."
     echo "------------------------------------------"
-    #바로 실행까지 원하시면 아래 줄 주석(#)을 해제하세요
     ./$OUTPUT_FILE
 else
     echo "Compilation Failed."
